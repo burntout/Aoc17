@@ -1,4 +1,3 @@
-
 reDist :: [Int] -> [Int]
 reDist memList = zipWith (+) toAdd zeroMemList
     where
