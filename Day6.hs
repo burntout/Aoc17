@@ -1,15 +1,15 @@
 reDist :: [Int] -> [Int]
-reDist memList = zipWith (+) toAdd zeroMemList
+reDist memList = zipWith (+) memToAdd zeroMemListLocation
     where
         numMemBanks = length memList
-        toReDist = maximum memList
-        location = memIndex toReDist memList
-        zeroMemList = zeroIndex (location ) memList
-        allGet  = replicate numMemBanks $ div toReDist numMemBanks
-        remain = rem toReDist numMemBanks
-        someGet = replicate remain 1 
-        remainder = replicate (numMemBanks - remain) 0
-        toAdd = rotate ((numMemBanks -1 ) - location)$ zipWith (+) allGet (someGet ++ remainder)
+        memToReDist = maximum memList
+        reDistLocation = listIndex memToReDist memList
+        zeroMemListLocation = zeroIndex (reDistLocation) memList
+        allMemLocationsGet  = replicate numMemBanks $ div memToReDist numMemBanks
+        remainingMem = rem memToReDist numMemBanks
+        someMemLocationsGet = replicate remainingMem 1 
+        padding = replicate (numMemBanks - remainingMem) 0
+        memToAdd = rotate ((numMemBanks -1 ) - reDistLocation)$ zipWith (+) allMemLocationsGet (someMemLocationsGet ++ padding)
 
 rotate :: Int -> [a] -> [a]
 rotate n l  = take (length l) $ drop n $ cycle l
@@ -17,14 +17,14 @@ rotate n l  = take (length l) $ drop n $ cycle l
 zeroIndex 0 (x:xs) = (0:xs)
 zeroIndex i (x:xs) = (x:zeroIndex (i-1) xs)
 
-memIndex v l  = memIndex' v l 0
-memIndex' v (l:ls) c
-    | v == l  = c
-    | otherwise = memIndex' v ls (c+1)
+listIndex value list  = listIndex' value list 0
+listIndex' val (l:ls) cnt
+    | val == l  = cnt
+    | otherwise = listIndex' val ls (cnt+1)
 
-memCycles memList knownStates cnt
-    | memList `elem` knownStates = (cnt, cnt - (memIndex memList knownStates))
-    | otherwise                  = memCycles memList' knownStates' (cnt+1)
+memDistCycles memList knownStates cnt
+    | memList `elem` knownStates = (cnt, cnt - (listIndex memList knownStates))
+    | otherwise                  = memDistCycles memList' knownStates' (cnt+1)
     where 
         memList' = reDist memList
         knownStates' = knownStates ++ [memList]
